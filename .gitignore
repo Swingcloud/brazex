@@ -25,3 +25,4 @@ brazex-*.tar
 /priv/plts/*.plt
 /priv/plts/*.plt.hash
 
+mix.lock
