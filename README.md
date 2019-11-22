@@ -1,6 +1,6 @@
 # Brazex
 
-**TODO: Add description**
+Web Client for Braze integration
 
 ## Installation
 
