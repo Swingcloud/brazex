@@ -12,8 +12,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - uses: actions/cache@v1
+      with:
+        path: deps
+        key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+        restore-keys: |
+          ${{ runner.os }}-mix-
+    - uses: actions/cache@v1
+      with:
+        path: priv/plts
+        key: ${{ runner.os }}-plts
+        resore-keys: ${{ runner.os }}-plts
     - name: Install Dependencies
       run: |
+        mkdir -p priv/plts
         mix local.rebar --force
         mix local.hex --force
         mix deps.get
