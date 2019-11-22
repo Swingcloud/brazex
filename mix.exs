@@ -7,6 +7,7 @@ defmodule Brazex.MixProject do
       version: "0.1.0",
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
       elixirc_options: elixirc_options(Mix.env()),
       aliases: aliases(),
       dialyzer: [
@@ -35,6 +36,9 @@ defmodule Brazex.MixProject do
 
   defp elixirc_options(_), do: []
 
+  defp elixirc_paths(:test), do: ["test/support", "lib"]
+  defp elixirc_paths(_), do: ["lib"]
+
   defp aliases do
     [
       quality: ["format", "credo --strict", "dialyzer", "test"],
@@ -51,7 +55,12 @@ defmodule Brazex.MixProject do
   defp deps do
     [
       {:credo, "~> 1.1", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0.0-rc.7", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.0.0-rc.7", only: [:dev, :test], runtime: false},
+      {:httpoison, "~> 1.6"},
+      {:jason, "~> 1.1"},
+      {:mox, "~> 0.5", only: :test}
+      # {:dep_from_hexpm, "~> 0.3.0"},
+      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]
   end
 end
