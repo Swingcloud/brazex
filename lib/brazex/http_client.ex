@@ -6,25 +6,24 @@ defmodule Brazex.HttpClient do
   @callback get(String.t()) :: response
 
   def post(url, body \\ "", options \\ nil) do
-    case HTTPoison.post(url, body, options) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        {:ok, %{}}
-
-      {:ok, %HTTPoison.Response{status_code: 404}} ->
-        {:error, %{error: "Not found"}}
-
-      {:error, %HTTPoison.Error{reason: reason}} ->
-        {:error, %{error: reason}}
-    end
+    url
+    |> HTTPoison.post(body, options)
+    |> parse_response()
   end
 
   def get(url) do
-    case HTTPoison.get(url) do
+    url
+    |> HTTPoison.get()
+    |> parse_response()
+  end
+
+  defp parse_response(response) do
+    case response do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        {:ok, body}
+        {:ok, Jason.decode!(body)}
 
       {:ok, %HTTPoison.Response{status_code: 404}} ->
-        {:error, %{error: "Not found"}}
+        {:error, %{error: "404 Not found"}}
 
       {:error, %HTTPoison.Error{reason: reason}} ->
         {:error, %{error: reason}}
