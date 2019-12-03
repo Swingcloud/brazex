@@ -5,7 +5,13 @@ defmodule Brazex.HttpClient do
   @callback post(String.t(), String.t(), map() | nil) :: response
   @callback get(String.t()) :: response
 
-  def post(url, body \\ "", options \\ nil) do
+  def post(
+        url,
+        body \\ "",
+        options \\ [
+          {"Content-Type", "application/json"}
+        ]
+      ) do
     url
     |> HTTPoison.post(body, options)
     |> parse_response()
@@ -20,7 +26,10 @@ defmodule Brazex.HttpClient do
   defp parse_response(response) do
     case response do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        {:ok, Jason.decode!(body)}
+        {:ok, map_response(body)}
+
+      {:ok, %HTTPoison.Response{status_code: 201, body: body}} ->
+        {:ok, map_response(body)}
 
       {:ok, %HTTPoison.Response{status_code: 404}} ->
         {:error, %{error: "404 Not found"}}
@@ -28,5 +37,17 @@ defmodule Brazex.HttpClient do
       {:error, %HTTPoison.Error{reason: reason}} ->
         {:error, %{error: reason}}
     end
+  end
+
+  def map_response(body) do
+    result = Jason.decode!(body)
+
+    %Brazex.Response{
+      errors: result["result"],
+      message: result["message"],
+      attributes_processed: result["attributes_processed"],
+      events_processed: result["events_processed"],
+      purchased_processed: result["purchased_processed"]
+    }
   end
 end
